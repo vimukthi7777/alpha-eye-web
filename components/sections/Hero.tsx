@@ -66,7 +66,7 @@ export default function Hero() {
       {/* character with baked-in glass pills */}
       <div
         data-hero-character
-        className="pointer-events-none absolute right-0 bottom-[24%] -z-[15] w-[58%] max-w-[720px] md:right-0 md:top-[14%] md:bottom-auto md:w-[46%]"
+        className="pointer-events-none absolute right-0 top-[calc(76%-51vw)] -z-[15] w-[66%] max-w-[720px] md:right-0 md:top-[14%] md:bottom-auto md:w-[46%]"
       >
         <div data-hero-float className="relative">
           <Image
@@ -75,7 +75,7 @@ export default function Hero() {
             width={1086}
             height={1040}
             priority
-            sizes="(min-width: 768px) 46vw, 58vw"
+            sizes="(min-width: 768px) 46vw, 66vw"
             className="h-auto w-full"
           />
         </div>
