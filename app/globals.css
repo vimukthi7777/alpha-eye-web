@@ -1,26 +1,264 @@
 @import "tailwindcss";
 
+/* Design tokens (Tailwind v4 – CSS-first config) */
+@theme {
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+
+  --color-bg: #000000;
+  --color-surface: #0b0b0b;
+  --color-accent: #de5d0a;
+  --color-accent-glow: rgb(222 93 10 / 0.4);
+  --color-ink: #ffffff;
+  --color-muted: #82807c;
+  --color-dim: #222222;
+
+  --spacing-gutter: 20px;
+  --spacing-margin: 80px;
+
+  --shadow-glow: 0 0 40px 0 var(--color-accent-glow);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --page-margin: 20px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@media (min-width: 768px) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --page-margin: 40px;
   }
 }
 
+@media (min-width: 1024px) {
+  :root {
+    --page-margin: 80px;
+  }
+}
+
+html {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  scroll-behavior: auto; /* GSAP/ScrollTrigger drives motion */
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  background-color: var(--color-bg); /* image comes from .bg-starfield on <body> */
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+/* 12-col grid: 80px margin, 20px gutter (margin scales down on small screens) */
+@utility container-grid {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: var(--page-margin);
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--spacing-gutter);
+}
+
+/* Starfield: black base + three layers of generated vector star tiles
+   (public/images/stars/*.svg, built by scripts/generate-stars.mjs). The tile sizes are
+   unrelated (700 / 1100 / 1700px) so the combined pattern never visibly repeats, and
+   being vector they stay crisp on any screen density. */
+@utility bg-starfield {
+  background-color: var(--color-bg);
+  background-image:
+    url("/images/stars/stars-3.svg"), url("/images/stars/stars-2.svg"),
+    url("/images/stars/stars-1.svg");
+  background-size: 1700px 1700px, 1100px 1100px, 700px 700px;
+  background-position: 0 0, 310px 140px, 90px 420px;
+  background-repeat: repeat;
+}
+
+/* Glassmorphism surface (navbar, pills, cards) */
+@utility glass {
+  background: rgb(255 255 255 / 0.06);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+@utility glow-accent {
+  box-shadow: var(--shadow-glow);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* Only applies when html has .respect-motion (see lib/motion.ts) */
+@media (prefers-reduced-motion: reduce) {
+  html.respect-motion *,
+  html.respect-motion *::before,
+  html.respect-motion *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Button hover: a white "liquid" fill floods the button from the point the cursor
+   enters (and drains toward where it leaves); text/arrow turn accent and the arrow
+   nudges up-right
+   (buttons with an icon circle rotate the circle + arrow 45° instead). GSAP drives --lx/--ly/--lr (see components/ui/MagneticButtons.tsx),
+   which also adds the magnetic cursor pull. Without JS (touch, reduced motion) the
+   plain :hover rule below fills the button instantly instead.
+   Mark an inner icon circle with data-btn-icon and its arrow with data-btn-arrow. */
+@utility btn-hover {
+  transition:
+    color 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s,
+    border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* doubled selector so it also wins over .glass's `background` shorthand */
+  &.btn-hover {
+    background-image: radial-gradient(
+      circle at var(--lx, 50%) var(--ly, 50%),
+      #fff var(--lr, -16px),
+      transparent calc(var(--lr, -16px) + 14px)
+    );
+    background-repeat: no-repeat;
+  }
+
+  [data-btn-arrow] {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  [data-btn-icon] {
+    transition:
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s,
+      color 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s;
+  }
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    border-color: #fff;
+    color: var(--color-accent);
+    box-shadow: 0 8px 30px rgb(222 93 10 / 0.28);
+
+    [data-btn-arrow] {
+      transform: translate(3px, -3px);
+    }
+    [data-btn-icon] {
+      transform: rotate(45deg);
+      background: rgb(222 93 10 / 0.14);
+      color: var(--color-accent);
+    }
+  }
+
+  /* fallback fill when the GSAP liquid effect is not running */
+  :root:not(.liquid-ready) &:hover:not(:disabled),
+  :root:not(.liquid-ready) &:focus-visible:not(:disabled) {
+    background-color: #fff;
+  }
+}
+
+/* Intro loader (components/ui/Loader.tsx) */
+.loader-wipe {
+  border-radius: 0 0 50% 50% / 0 0 8vh 8vh;
+  transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1) 0.2s;
+  /* invisible for the first 200ms so fast loads never show it (matches SHOW_AFTER_MS) */
+  animation:
+    loader-fade 0.2s ease-out 0.2s both,
+    loader-failsafe 0.3s ease 10s forwards;
+}
+.loader-wipe.loader-leaving {
+  transform: translateY(-110%);
+}
+.loader-content {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.loader-leaving .loader-content {
+  opacity: 0;
+  transform: scale(1.12);
+}
+.loader-logo {
+  animation: loader-logo-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+.loader-shine {
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgb(255 255 255 / 0.95) 50%,
+    transparent 65%
+  );
+  background-size: 250% 100%;
+  background-repeat: no-repeat;
+  animation: loader-shine 0.9s ease-in-out 0.45s infinite;
+}
+.loader-glow {
+  animation: loader-pulse 2.4s ease-in-out infinite;
+}
+.loader-text {
+  animation: loader-fade-up 0.5s ease-out 0.35s both;
+}
+/* Last resort if JavaScript never takes over (blocked script, failed hydration): hide it. */
+@keyframes loader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+@keyframes loader-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes loader-logo-in {
+  from {
+    opacity: 0;
+    scale: 0.5;
+    rotate: -12deg;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+@keyframes loader-shine {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+@keyframes loader-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+@keyframes loader-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* No loader for reduced motion (same switch as the rest of the site) */
+@media (prefers-reduced-motion: reduce) {
+  html.respect-motion #site-loader {
+    display: none;
+  }
 }

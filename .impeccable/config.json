@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "components/sections/Hero.tsx"
+        ],
+        "createdAt": "2026-10-12T07:44:51.158Z",
+        "reason": "intentional: hero horizon curve is a giant ellipse whose orange rim is the Figma design (design/sections/hero.png), not a bordered card; decided by assistant from mockup evidence"
+      }
+    ]
+  }
+}
