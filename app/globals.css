@@ -100,15 +100,22 @@ body {
   }
 }
 
-/* Button hover: a white "liquid" fill floods the button from the point the cursor
-   enters (and drains toward where it leaves); text/arrow turn accent and the arrow
-   nudges up-right
-   (buttons with an icon circle rotate the circle + arrow 45° instead). GSAP drives --lx/--ly/--lr (see components/ui/MagneticButtons.tsx),
-   which also adds the magnetic cursor pull. Without JS (touch, reduced motion) the
-   plain :hover rule below fills the button instantly instead.
-   Mark an inner icon circle with data-btn-icon and its arrow with data-btn-arrow. */
+/* Button hover: a white "liquid" fill floods the button from the point the cursor entered
+   and drains toward the point it left; text turns accent. It is pure CSS (:hover), so it
+   cannot get stuck however fast the mouse moves. components/ui/MagneticButtons.tsx only
+   stores the entry/exit point in --lx/--ly (and adds the magnetic pull).
+   Mark an inner icon circle with data-btn-icon (it rotates 45deg) and a bare arrow with
+   data-btn-arrow (it nudges up-right). */
+@property --lr {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: -16px;
+}
+
 @utility btn-hover {
+  --lr: -16px;
   transition:
+    --lr 0.6s cubic-bezier(0.65, 0, 0.35, 1),
     color 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s,
     border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
     background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
@@ -118,8 +125,8 @@ body {
   &.btn-hover {
     background-image: radial-gradient(
       circle at var(--lx, 50%) var(--ly, 50%),
-      #fff var(--lr, -16px),
-      transparent calc(var(--lr, -16px) + 14px)
+      #fff var(--lr),
+      transparent calc(var(--lr) + 14px)
     );
     background-repeat: no-repeat;
   }
@@ -136,6 +143,13 @@ body {
 
   &:hover:not(:disabled),
   &:focus-visible:not(:disabled) {
+    --lr: 40rem;
+    transition:
+      --lr 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s,
+      border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     border-color: #fff;
     color: var(--color-accent);
     box-shadow: 0 8px 30px rgb(222 93 10 / 0.28);
@@ -148,12 +162,6 @@ body {
       background: rgb(222 93 10 / 0.14);
       color: var(--color-accent);
     }
-  }
-
-  /* fallback fill when the GSAP liquid effect is not running */
-  :root:not(.liquid-ready) &:hover:not(:disabled),
-  :root:not(.liquid-ready) &:focus-visible:not(:disabled) {
-    background-color: #fff;
   }
 }
 

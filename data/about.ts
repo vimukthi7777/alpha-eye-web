@@ -10,8 +10,8 @@ export const about = {
   ],
   cta: { label: "See More...", href: "#services" },
   cards: [
-    "/images/cards/card1.svg",
-    "/images/cards/card2.svg",
-    "/images/cards/card3.svg",
+    "/images/cards/C1.png",
+    "/images/cards/C2.png",
+    "/images/cards/C3.png",
   ],
 };

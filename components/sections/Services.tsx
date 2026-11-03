@@ -83,11 +83,11 @@ export default function Services() {
         {/* preview + list */}
         <div
           data-svc-preview
-          className="col-span-12 md:col-span-5 lg:col-span-4"
+          className="col-span-12 md:col-span-6 lg:col-span-5"
         >
           <div
             ref={previewRef}
-            className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-white/5"
+            className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-white/5"
           >
             {services.map((s, i) => (
               <Image
@@ -96,14 +96,14 @@ export default function Services() {
                 src={s.image}
                 alt={i === active ? s.title : ""}
                 fill
-                sizes="(min-width: 1024px) 30vw, (min-width: 768px) 40vw, 100vw"
-                className={cn("object-cover", i !== 0 && "opacity-0")}
+                sizes="(min-width: 1024px) 38vw, (min-width: 768px) 46vw, 100vw"
+                className={cn("object-cover object-left-top", i !== 0 && "opacity-0")}
               />
             ))}
           </div>
         </div>
 
-        <ul className="col-span-12 md:col-span-7 lg:col-span-8">
+        <ul className="col-span-12 md:col-span-6 lg:col-span-7">
           {services.map((s, i) => {
             const on = i === active;
             return (
